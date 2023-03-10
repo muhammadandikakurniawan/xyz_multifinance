@@ -1,0 +1,12 @@
+docker-volume/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+*.cov
+.idea
+.env
+.vscode

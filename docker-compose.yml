@@ -1,0 +1,23 @@
+services:
+  minio:
+    image: minio/minio
+    # command: server /data
+    command: server /data --console-address :9001
+    environment:
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=password
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - ./docker-volume/minio:/data
+  
+  mysql:
+    image: mysql:8.0.23
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: passwordadmin
+    ports:
+      - 3325:3306
+    volumes:
+      - ./docker-volume/mysql:/var/lib/mysql
