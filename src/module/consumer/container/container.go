@@ -1,7 +1,7 @@
-// go:build wireinject
 //go:build wireinject
 // +build wireinject
 
+// go:build wireinject
 package container
 
 import (
@@ -11,6 +11,7 @@ import (
 	"github.com/muhammadandikakurniawan/xyz_multifinance/src/module/consumer/infrastructure/filestorage"
 	mysqlRepo "github.com/muhammadandikakurniawan/xyz_multifinance/src/module/consumer/infrastructure/repository/mysql"
 	"github.com/muhammadandikakurniawan/xyz_multifinance/src/module/consumer/usecase/consumer"
+	"github.com/muhammadandikakurniawan/xyz_multifinance/src/shared/crypto/aes"
 	"github.com/muhammadandikakurniawan/xyz_multifinance/src/shared/database"
 	"github.com/muhammadandikakurniawan/xyz_multifinance/src/shared/minio"
 	"github.com/muhammadandikakurniawan/xyz_multifinance/src/shared/moduleregistry"
@@ -52,6 +53,14 @@ func newContainer(
 	return c
 }
 
+func NewCryptoUtility(appConfig config.AppConfig) aes.AesCBCCrypto {
+	res, err := aes.NewAesCbc(appConfig.CryptoAesIV, appConfig.CryptoAesKey)
+	if err != nil {
+		panic(err)
+	}
+	return res
+}
+
 func InitializeDependencyContainer() Container {
 	wire.Build(
 		moduleregistry.NewModuleRegistry,
@@ -61,6 +70,7 @@ func InitializeDependencyContainer() Container {
 		validator.New,
 		mysqlRepo.NewConsumerRepository,
 		filestorage.NewFileBucketClient,
+		NewCryptoUtility,
 		consumer.NewConsumerUsecase,
 		newContainer,
 	)

@@ -7,11 +7,20 @@ import (
 	"fmt"
 )
 
-func NewAesCbc(iv, key string) AesCBCCrypto {
-	return AesCBCCrypto{
+func NewAesCbc(iv, key string) (res AesCBCCrypto, err error) {
+	if len(iv) != 16 {
+		err = fmt.Errorf("invalid iv : %s", iv)
+		return
+	}
+	if len(key) != 32 {
+		err = fmt.Errorf("invalid key : %s", key)
+		return
+	}
+	res = AesCBCCrypto{
 		initialVector: []byte(iv),
 		key:           []byte(key),
 	}
+	return
 }
 
 type AesCBCCrypto struct {

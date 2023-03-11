@@ -38,18 +38,60 @@ func (_m *ConsumerUsecase) AddTenorLimit(ctx context.Context, requestData dto.Ad
 }
 
 // ApproveRequestLoan provides a mock function with given fields: ctx, requestData
-func (_m *ConsumerUsecase) ApproveRequestLoan(ctx context.Context, requestData dto.ConsumerDto) (model.BaseResponseModel[dto.ApprovalResponseDataDto], error) {
+func (_m *ConsumerUsecase) ApproveRequestLoan(ctx context.Context, requestData dto.ApprovalResponseDataDto) (model.BaseResponseModel[dto.ApprovalResponseDataDto], error) {
 	ret := _m.Called(ctx, requestData)
 
 	var r0 model.BaseResponseModel[dto.ApprovalResponseDataDto]
-	if rf, ok := ret.Get(0).(func(context.Context, dto.ConsumerDto) model.BaseResponseModel[dto.ApprovalResponseDataDto]); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, dto.ApprovalResponseDataDto) model.BaseResponseModel[dto.ApprovalResponseDataDto]); ok {
 		r0 = rf(ctx, requestData)
 	} else {
 		r0 = ret.Get(0).(model.BaseResponseModel[dto.ApprovalResponseDataDto])
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, dto.ConsumerDto) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, dto.ApprovalResponseDataDto) error); ok {
+		r1 = rf(ctx, requestData)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetConsumer provides a mock function with given fields: ctx, consumerId
+func (_m *ConsumerUsecase) GetConsumer(ctx context.Context, consumerId string) (model.BaseResponseModel[*dto.ConsumerDto], error) {
+	ret := _m.Called(ctx, consumerId)
+
+	var r0 model.BaseResponseModel[*dto.ConsumerDto]
+	if rf, ok := ret.Get(0).(func(context.Context, string) model.BaseResponseModel[*dto.ConsumerDto]); ok {
+		r0 = rf(ctx, consumerId)
+	} else {
+		r0 = ret.Get(0).(model.BaseResponseModel[*dto.ConsumerDto])
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, consumerId)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetListRequestLoan provides a mock function with given fields: ctx, requestData
+func (_m *ConsumerUsecase) GetListRequestLoan(ctx context.Context, requestData dto.GetListRequestLoanRequestDto) (model.BaseResponseModel[[]dto.RequestLoanDto], error) {
+	ret := _m.Called(ctx, requestData)
+
+	var r0 model.BaseResponseModel[[]dto.RequestLoanDto]
+	if rf, ok := ret.Get(0).(func(context.Context, dto.GetListRequestLoanRequestDto) model.BaseResponseModel[[]dto.RequestLoanDto]); ok {
+		r0 = rf(ctx, requestData)
+	} else {
+		r0 = ret.Get(0).(model.BaseResponseModel[[]dto.RequestLoanDto])
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, dto.GetListRequestLoanRequestDto) error); ok {
 		r1 = rf(ctx, requestData)
 	} else {
 		r1 = ret.Error(1)

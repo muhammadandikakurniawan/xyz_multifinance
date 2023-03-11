@@ -3,7 +3,7 @@ package dto
 import "github.com/muhammadandikakurniawan/xyz_multifinance/src/module/consumer/entity"
 
 type TenorLimitDto struct {
-	ConsumerId string  `json:"consumer_id" validate:"required"`
+	ConsumerId string  `json:"consumer_id,omitempty" validate:"required"`
 	Month      int     `json:"month" validate:"required"`
 	Value      float64 `json:"value" validate:"required"`
 }

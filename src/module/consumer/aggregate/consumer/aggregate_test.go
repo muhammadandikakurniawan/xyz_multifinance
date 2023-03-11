@@ -89,17 +89,17 @@ func Test_AddTenorLimit(t *testing.T) {
 		aggregate := consumer.BuildConsumerAggregate(aggregateRoot)
 
 		requestLoan := []*entity.TenorLimitEntity{
-			&entity.TenorLimitEntity{
+			{
 				ConsumerId: aggregateRoot.Id,
 				Month:      1,
 				LimitValue: 3000000,
 			},
-			&entity.TenorLimitEntity{
+			{
 				ConsumerId: aggregateRoot.Id,
 				Month:      2,
 				LimitValue: 5000000,
 			},
-			&entity.TenorLimitEntity{
+			{
 				ConsumerId: aggregateRoot.Id,
 				Month:      3,
 				LimitValue: 0,
@@ -144,5 +144,59 @@ func Test_AddTenorLimit(t *testing.T) {
 		assert.Equal(t, 3, deleteTenorData[0].Month)
 		assert.Equal(t, float64(0), deleteTenorData[0].LimitValue)
 		// ======
+	})
+}
+
+func Test_ApproveLimit(t *testing.T) {
+	t.Run("successs", func(t *testing.T) {
+		aggregateRoot := entity.ConsumerEntity{
+			Id: "d066a2a3-a8cf-47f5-b5ae-d8cffa7071e2",
+		}
+
+		aggregateRoot.AddRequestLoan(entity.RequestLoanEntity{
+			Id:         1,
+			ConsumerId: aggregateRoot.Id,
+		})
+
+		aggregate := consumer.BuildConsumerAggregate(aggregateRoot)
+
+		err := aggregate.ApproveRequestLoan(1, true)
+		assert.Nil(t, err)
+
+		events := aggregate.GetEvents()
+		assert.Equal(t, 1, len(events))
+
+		approveEvent, approveEventValid := events[0].(event.ApproveRequestLoanEvent)
+		assert.Equal(t, true, approveEventValid)
+
+		eventData := approveEvent.GetData()
+		assert.NotNil(t, eventData)
+		assert.NotNil(t, eventData.IsApproved)
+		assert.Equal(t, true, *eventData.IsApproved)
+	})
+
+	t.Run("failed set is_approve", func(t *testing.T) {
+		aggregateRoot := entity.ConsumerEntity{
+			Id: "d066a2a3-a8cf-47f5-b5ae-d8cffa7071e2",
+		}
+
+		isApprove := true
+		aggregateRoot.AddRequestLoan(entity.RequestLoanEntity{
+			Id:         1,
+			ConsumerId: aggregateRoot.Id,
+			IsApproved: &isApprove,
+		})
+
+		aggregate := consumer.BuildConsumerAggregate(aggregateRoot)
+
+		err := aggregate.ApproveRequestLoan(1, true)
+		assert.NotNil(t, err)
+		appErr, ok := err.(sharedErr.AppError)
+		assert.Equal(t, true, ok)
+		assert.Equal(t, sharedErr.ERROR_BAD_REQUEST, appErr.ErrorCode)
+		assert.Equal(t, "cannot set approval for this request", appErr.Message)
+
+		events := aggregate.GetEvents()
+		assert.Equal(t, 0, len(events))
 	})
 }

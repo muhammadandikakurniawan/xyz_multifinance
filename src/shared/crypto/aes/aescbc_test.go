@@ -11,7 +11,7 @@ func Test_aesCbc(t *testing.T) {
 	key := "acfa7a047800b2f221f2c4f7d626eafb"
 	plainTxt := "test-plain-text-123-test-plain-text-123asdasdasd!@#$%^&*()"
 
-	aesCrypto := NewAesCbc(iv, key)
+	aesCrypto, _ := NewAesCbc(iv, key)
 
 	encryptedTxt, err := aesCrypto.Encrypt([]byte(plainTxt))
 	if err != nil {

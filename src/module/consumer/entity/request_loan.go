@@ -16,3 +16,19 @@ type RequestLoanEntity struct {
 	UpdatedAt      *time.Time `json:"updated_at"`
 	DeletedAt      *time.Time `json:"deleted_at"`
 }
+
+type RequestLoanApprovalStatus string
+
+var (
+	RequestLoanApprovalStatus_APPROVED RequestLoanApprovalStatus = "APPROVED"
+	RequestLoanApprovalStatus_REJECTED RequestLoanApprovalStatus = "REJECTED"
+	RequestLoanApprovalStatus_PENDING  RequestLoanApprovalStatus = "PENDING"
+)
+
+type SearchRequestLoanFilterModel struct {
+	ConsumerId     string                    `json:"consumer_id"`
+	ConsumerName   string                    `json:"consumer_name"`
+	ContractNumber string                    `json:"contract_number"`
+	AssetName      string                    `json:"asset_name"`
+	ApprovalStatus RequestLoanApprovalStatus `json:"approval_status"`
+}

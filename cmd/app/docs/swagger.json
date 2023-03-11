@@ -1,0 +1,341 @@
+{
+  "swagger": "2.0",
+  "paths": {
+    "/consumer/approve-request-loan": {
+      "put": {
+        "description": "Add tenor limit for consumer",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "approveRequestLoan",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/ApprovalResponseDataDto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "set is_approve request loan"
+          }
+        }
+      }
+    },
+    "/consumer/register": {
+      "post": {
+        "description": "Register consumer",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "consumer"
+        ],
+        "operationId": "registerConsumer",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/RequestCreateNewConsumerDto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "register response"
+          }
+        }
+      }
+    },
+    "/consumer/request-loan": {
+      "post": {
+        "description": "request loan",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "consumer"
+        ],
+        "operationId": "requestLoan",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/RequestLoanDto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "request loan"
+          }
+        }
+      }
+    },
+    "/consumer/search-request-loan": {
+      "get": {
+        "description": "Add tenor limit for consumer",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "consumer"
+        ],
+        "operationId": "searchRequestLoan",
+        "parameters": [
+          {
+            "name": "current_page",
+            "in": "query"
+          },
+          {
+            "name": "total_data",
+            "in": "query"
+          },
+          {
+            "name": "consumer_id",
+            "in": "query"
+          },
+          {
+            "name": "asset_name",
+            "in": "query"
+          },
+          {
+            "name": "contract_number",
+            "in": "query"
+          },
+          {
+            "name": "consumer_name",
+            "in": "query"
+          },
+          {
+            "name": "approval_status",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "get list consumer's request loan"
+          }
+        }
+      }
+    },
+    "/consumer/tenor-limit": {
+      "post": {
+        "description": "Add tenor limit for consumer",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "addTenorLimit",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/AddTenorLmitRequestDto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "add consumer tenor limit"
+          }
+        }
+      }
+    },
+    "/consumer/{id}": {
+      "get": {
+        "description": "get consumer data",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "consumer",
+          "admin"
+        ],
+        "operationId": "GetConsumer",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Consumer ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "get consumer data"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "AddTenorLmitRequestDto": {
+      "type": "object",
+      "properties": {
+        "consumer_id": {
+          "type": "string",
+          "x-go-name": "ConsumerId"
+        },
+        "limits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TenorLimitDto"
+          },
+          "x-go-name": "Limits"
+        }
+      },
+      "x-go-package": "github.com/muhammadandikakurniawan/xyz_multifinance/src/module/consumer/usecase/consumer/dto"
+    },
+    "ApprovalResponseDataDto": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Id"
+        },
+        "is_approved": {
+          "type": "boolean",
+          "x-go-name": "IsApproved"
+        }
+      },
+      "x-go-package": "github.com/muhammadandikakurniawan/xyz_multifinance/src/module/consumer/usecase/consumer/dto"
+    },
+    "RequestCreateNewConsumerDto": {
+      "type": "object",
+      "properties": {
+        "date_of_birth": {
+          "description": "The birth date for this consumer, ex : dd/mm/yyyy (29/12/1999)",
+          "type": "string",
+          "x-go-name": "DateOfBirth"
+        },
+        "fullname": {
+          "type": "string",
+          "x-go-name": "Fullname"
+        },
+        "ktp_base64": {
+          "type": "string",
+          "x-go-name": "KtpImageBase64"
+        },
+        "legalname": {
+          "type": "string",
+          "x-go-name": "Legalname"
+        },
+        "nik": {
+          "description": "Unique identifier for this consumer, need ecrypted using aes cbc",
+          "type": "string",
+          "maximum": 20,
+          "minimum": 16,
+          "x-go-name": "NIK"
+        },
+        "place_of_birth": {
+          "type": "string",
+          "x-go-name": "PlaceOfBirth"
+        },
+        "salary": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Salary"
+        },
+        "selfie_base64": {
+          "type": "string",
+          "x-go-name": "SelfeBase64"
+        }
+      },
+      "x-go-package": "github.com/muhammadandikakurniawan/xyz_multifinance/src/module/consumer/usecase/consumer/dto"
+    },
+    "RequestLoanDto": {
+      "type": "object",
+      "properties": {
+        "admin_fee": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "AdminFee"
+        },
+        "asset_name": {
+          "type": "string",
+          "x-go-name": "AssetName"
+        },
+        "consumer_id": {
+          "type": "string",
+          "x-go-name": "ConsumerId"
+        },
+        "consumer_name": {
+          "type": "string",
+          "x-go-name": "ConsumerName"
+        },
+        "consumer_salary": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "ConsumerSalary"
+        },
+        "contract_number": {
+          "type": "string",
+          "x-go-name": "ContractNumber"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Id"
+        },
+        "installment": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Installment"
+        },
+        "interest": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Interest"
+        },
+        "is_approved": {
+          "type": "boolean",
+          "x-go-name": "IsApproved"
+        },
+        "otr": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "OTR"
+        }
+      },
+      "x-go-package": "github.com/muhammadandikakurniawan/xyz_multifinance/src/module/consumer/usecase/consumer/dto"
+    },
+    "TenorLimitDto": {
+      "type": "object",
+      "properties": {
+        "consumer_id": {
+          "type": "string",
+          "x-go-name": "ConsumerId"
+        },
+        "month": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Month"
+        },
+        "value": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Value"
+        }
+      },
+      "x-go-package": "github.com/muhammadandikakurniawan/xyz_multifinance/src/module/consumer/usecase/consumer/dto"
+    }
+  }
+}

@@ -13,6 +13,7 @@ type BaseResponseModel[T_DATA any] struct {
 	Success        bool   `json:"success"`
 	StatusCode     string `json:"status_code"`
 	HttpStatusCode int    `json:"http_status_code"`
+	PaginationResponseModel
 }
 
 func (m *BaseResponseModel[T_DATA]) SetData(data T_DATA) *BaseResponseModel[T_DATA] {

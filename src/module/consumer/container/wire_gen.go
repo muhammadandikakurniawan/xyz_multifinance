@@ -12,6 +12,7 @@ import (
 	"github.com/muhammadandikakurniawan/xyz_multifinance/src/module/consumer/infrastructure/filestorage"
 	"github.com/muhammadandikakurniawan/xyz_multifinance/src/module/consumer/infrastructure/repository/mysql"
 	"github.com/muhammadandikakurniawan/xyz_multifinance/src/module/consumer/usecase/consumer"
+	"github.com/muhammadandikakurniawan/xyz_multifinance/src/shared/crypto/aes"
 	"github.com/muhammadandikakurniawan/xyz_multifinance/src/shared/database"
 	"github.com/muhammadandikakurniawan/xyz_multifinance/src/shared/minio"
 	"github.com/muhammadandikakurniawan/xyz_multifinance/src/shared/moduleregistry"
@@ -23,12 +24,13 @@ import (
 func InitializeDependencyContainer() Container {
 	moduleRegistry := moduleregistry.NewModuleRegistry()
 	appConfig := config.LoadByEnv()
+	aesCBCCrypto := NewCryptoUtility(appConfig)
 	validate := validator.New()
 	db := NewMysqlDb(appConfig)
 	consumerRepository := mysql.NewConsumerRepository(db)
 	minio := NewMinioClient(appConfig)
 	fileStorage := filestorage.NewFileBucketClient(minio)
-	consumerUsecase := consumer.NewConsumerUsecase(appConfig, validate, consumerRepository, fileStorage)
+	consumerUsecase := consumer.NewConsumerUsecase(appConfig, aesCBCCrypto, validate, consumerRepository, fileStorage)
 	container := newContainer(moduleRegistry, appConfig, consumerUsecase)
 	return container
 }
@@ -68,4 +70,12 @@ func newContainer(
 		ConsumerUsecase: ConsumerUsecase,
 	}
 	return c
+}
+
+func NewCryptoUtility(appConfig config.AppConfig) aes.AesCBCCrypto {
+	res, err := aes.NewAesCbc(appConfig.CryptoAesIV, appConfig.CryptoAesKey)
+	if err != nil {
+		panic(err)
+	}
+	return res
 }
