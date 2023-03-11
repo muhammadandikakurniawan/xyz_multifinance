@@ -20,6 +20,11 @@ func NewMinio(config MinioConfig) (res Minio, err error) {
 	if err != nil {
 		return
 	}
+
+	_, err = client.BucketExists(context.TODO(), "app")
+	if err != nil {
+		return
+	}
 	res = &minioImpl{client, config}
 	return
 }

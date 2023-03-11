@@ -1,8 +1,11 @@
 services:
-  minio:
+  xyz_multifinance_minio:
     image: minio/minio
-    # command: server /data
-    command: server /data --console-address :9001
+    container_name: xyz_multifinance_minio
+    # command: server /data --console-address 0.0.0.0:9001 --address 0.0.0.0:9000
+    command: server --console-address ':9001' /data
+    # command: server --address 0.0.0.0:9000 /data
+    # command: minio server /data
     environment:
       - MINIO_ACCESS_KEY=admin
       - MINIO_SECRET_KEY=password
@@ -11,9 +14,13 @@ services:
       - 9001:9001
     volumes:
       - ./docker-volume/minio:/data
+    networks:
+      - xyz_multifinance_net
+    hostname: xymultifinanceminiohost
   
-  mysql:
+  xyz_multifinance_mysql:
     image: mysql:8.0.23
+    container_name: xyz_multifinance_mysql
     command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: passwordadmin
@@ -21,3 +28,40 @@ services:
       - 3325:3306
     volumes:
       - ./docker-volume/mysql:/var/lib/mysql
+    networks:
+      - xyz_multifinance_net
+
+  xyz_multifinance_api:
+    environment:
+      - HTTP_PORT=2404
+      - MODULE_CONSUMER_DB_MYSQL_STRCONNECTION=root:passwordadmin@tcp(xyz_multifinance_mysql:3306)/consumer?parseTime=true
+      - CRYPTO_AES_KEY=AESKEYXYZMULTIFINANCE12023030923
+      - CRYPTO_AES_IV=acfa7a047800b2f2
+      - MINIO_TIMEOUT=5000000000
+      - MINIO_HOST=xymultifinanceminiohost:9000
+      - MINIO_KEY_ID=admin
+      - MINIO_ACESS_KEY=password
+      - MINIO_SSL=false
+      - MINIO_BUCKET=ideas-user-service
+      - MINIO_SUB_BUCKET_USER=user
+      - MINIO_SUB_BUCKET_USER_ACCOUNT=user-accounts
+      - MINIO_SUB_BUCKET_ASSET=assets
+      - MINIO_EXTERNAL_HOST=http://127.0.0.1:9000
+      - BUCKET_CONSUMER_IMAGE=images
+    ports:
+      - "2404:2404"
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - xyz_multifinance_mysql
+      - xyz_multifinance_minio
+    links:
+      - xyz_multifinance_mysql
+      - xyz_multifinance_minio
+    networks:
+      - xyz_multifinance_net
+
+networks:
+  xyz_multifinance_net:
+    name: xyz_multifinance_net

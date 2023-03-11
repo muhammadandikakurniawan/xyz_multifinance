@@ -1,7 +1,15 @@
-PACKAGE_NAME := xyz_multifinance_app
+PACKAGE_NAME := github.com/muhammadandikakurniawan/xyz_multifinance
+
+deploy:
+	docker-compose up --build -d
 
 swagger:
-	swagger generate spec --scan-models --output=./swagger.yaml
+	cd cmd/app
+	swagger generate spec --scan-models --output=./docs/swagger.json
+
+swaggo:
+	cd cmd/app
+	swag init
 
 wire:
 	go run github.com/google/wire/cmd/wire
@@ -11,6 +19,7 @@ run:
 	go run main.go
 
 install:
+	go install github.com/swaggo/swag/cmd/swag@latest
 	go get golang.org/x/tools/cmd/cover
 	go install github.com/google/wire/cmd/wire@latest
 	go get github.com/google/wire/cmd/wire
@@ -21,7 +30,8 @@ test:
 	@echo "=================================================================================="
 	@echo "Coverage Test"
 	@echo "=================================================================================="
-	go fmt ./... && go test -coverprofile coverage.cov -cover ./... # use -v for verbose
+	go fmt ./... 
+	go test -coverprofile coverage.cov -cover ./...
 	@echo "\n"
 	@echo "=================================================================================="
 	@echo "All Package Coverage"

@@ -14,6 +14,20 @@ type FileStorage struct {
 	mock.Mock
 }
 
+// CreateDirectory provides a mock function with given fields: ctx, dirname
+func (_m *FileStorage) CreateDirectory(ctx context.Context, dirname string) error {
+	ret := _m.Called(ctx, dirname)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = rf(ctx, dirname)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // UploadBase64 provides a mock function with given fields: ctx, opt
 func (_m *FileStorage) UploadBase64(ctx context.Context, opt filestorage.UploadFileOpt) (filestorage.UploadResultOpt, error) {
 	ret := _m.Called(ctx, opt)

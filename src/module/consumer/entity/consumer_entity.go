@@ -24,7 +24,8 @@ type ConsumerEntity struct {
 	TenorLimits          []TenorLimitEntity        `json:"tenor_limits"`
 	MapTenorLimitByMonth map[int]*TenorLimitEntity `json:"-"`
 
-	ListRequestLoan []RequestLoanEntity `json:"list_request_loan"`
+	ListRequestLoan    []RequestLoanEntity          `json:"list_request_loan"`
+	MapRequestLoanById map[int64]*RequestLoanEntity `json:"-"`
 }
 
 func (e *ConsumerEntity) AddTenorLimit(tl TenorLimitEntity) {
@@ -37,7 +38,12 @@ func (e *ConsumerEntity) AddTenorLimit(tl TenorLimitEntity) {
 }
 
 func (e *ConsumerEntity) AddRequestLoan(req RequestLoanEntity) {
+	if e.MapRequestLoanById == nil {
+		e.MapRequestLoanById = map[int64]*RequestLoanEntity{}
+	}
+
 	e.ListRequestLoan = append(e.ListRequestLoan, req)
+	e.MapRequestLoanById[req.Id] = &e.ListRequestLoan[len(e.ListRequestLoan)-1]
 }
 
 func (e ConsumerEntity) ValidateNewConsumer() (err error) {

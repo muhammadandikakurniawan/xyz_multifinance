@@ -5,6 +5,8 @@ type ApprovalRequestaDto struct {
 	ContractNumber bool `json:"contract_number" validate:"required"`
 }
 
+// swagger:model
 type ApprovalResponseDataDto struct {
-	IsApproved bool `json:"is_approved" validate:"required"`
+	Id         int64 `json:"id" validate:"required"`
+	IsApproved bool  `json:"is_approved" validate:"required"`
 }

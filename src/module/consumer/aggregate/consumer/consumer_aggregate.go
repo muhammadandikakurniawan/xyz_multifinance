@@ -1,6 +1,7 @@
 package consumer
 
 import (
+	"encoding/base64"
 	"fmt"
 	"strings"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"github.com/muhammadandikakurniawan/xyz_multifinance/src/module/consumer/aggregate/consumer/event"
 	"github.com/muhammadandikakurniawan/xyz_multifinance/src/module/consumer/entity"
 	"github.com/muhammadandikakurniawan/xyz_multifinance/src/shared/abstraction"
+	"github.com/muhammadandikakurniawan/xyz_multifinance/src/shared/crypto"
 	sharedError "github.com/muhammadandikakurniawan/xyz_multifinance/src/shared/error"
 )
 
@@ -27,6 +29,9 @@ func BuildConsumerAggregate(aggregateRoot entity.ConsumerEntity) ConsumerAggrega
 	if ag.aggregateRoot.MapTenorLimitByMonth == nil {
 		ag.aggregateRoot.MapTenorLimitByMonth = map[int]*entity.TenorLimitEntity{}
 	}
+	if ag.aggregateRoot.MapRequestLoanById == nil {
+		ag.aggregateRoot.MapRequestLoanById = map[int64]*entity.RequestLoanEntity{}
+	}
 	return ag
 }
 
@@ -37,6 +42,11 @@ type ConsumerAggregate struct {
 
 func (ag ConsumerAggregate) GetAggregateRoot() entity.ConsumerEntity {
 	return ag.aggregateRoot
+}
+
+func (ag *ConsumerAggregate) EncryptNik(encryptor crypto.PkgCrypto) {
+	nikByte, _ := encryptor.Encrypt([]byte(ag.aggregateRoot.NIK))
+	ag.aggregateRoot.NIK = base64.StdEncoding.EncodeToString(nikByte)
 }
 
 func (ag *ConsumerAggregate) CreateNew() (err error) {
@@ -62,6 +72,10 @@ func (ag *ConsumerAggregate) AddTenorLimit(tenorlimits ...*entity.TenorLimitEnti
 	monthSet := map[int]bool{}
 
 	for _, tl := range tenorlimits {
+		if tl.Month > 12 {
+			err = sharedError.NewAppError(sharedError.ERROR_BAD_REQUEST, "invalid month", "invalid month")
+			return
+		}
 		_, alredyProcesses := monthSet[tl.Month]
 		if alredyProcesses {
 			continue
@@ -195,5 +209,29 @@ func (ag *ConsumerAggregate) AddRequestLoan(req *entity.RequestLoanEntity) (err 
 	req.ContractNumber = fmt.Sprintf("REQ-LOAN-%s", uuid.NewString())
 	req.CreatedAt = time.Now()
 	ag.AddEvent(event.NewRequestLoanEvent(req))
+	return
+}
+
+func (ag *ConsumerAggregate) ApproveRequestLoan(reqLoanId int64, isApproved bool) (err error) {
+	if ag.aggregateRoot.MapRequestLoanById == nil {
+		err = sharedError.NewAppError(sharedError.ERROR_BAD_REQUEST, "request not found", "request not found")
+		return
+	}
+
+	reqLoan, exists := ag.aggregateRoot.MapRequestLoanById[reqLoanId]
+	if !exists {
+		err = sharedError.NewAppError(sharedError.ERROR_BAD_REQUEST, "request not found", "request not found")
+		return
+	}
+
+	if reqLoan.IsApproved != nil {
+		err = sharedError.NewAppError(sharedError.ERROR_BAD_REQUEST, "cannot set approval for this request", "cannot set approval for this request")
+		return
+	}
+
+	reqLoan.IsApproved = &isApproved
+	updatedAt := time.Now()
+	reqLoan.UpdatedAt = &updatedAt
+	ag.AddEvent(event.NewApproveRequestLoanEvent(reqLoan))
 	return
 }
